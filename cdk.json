@@ -1,5 +1,5 @@
 {
-  "app": "go mod download && go run infra.go",
+  "app": "go mod download && go run infra/infra.go",
   "context": {
     "@aws-cdk/aws-apigateway:usagePlanKeyOrderInsensitiveId": true,
     "@aws-cdk/core:enableStackNameDuplicates": "true",
