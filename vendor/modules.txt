@@ -3,6 +3,8 @@ github.com/Masterminds/semver/v3
 # github.com/aws/aws-cdk-go/awscdk v1.110.1-devpreview
 ## explicit
 github.com/aws/aws-cdk-go/awscdk
+github.com/aws/aws-cdk-go/awscdk/awscloudwatch
+github.com/aws/aws-cdk-go/awscdk/awscloudwatch/internal
 github.com/aws/aws-cdk-go/awscdk/awsevents
 github.com/aws/aws-cdk-go/awscdk/awsevents/internal
 github.com/aws/aws-cdk-go/awscdk/awsiam
