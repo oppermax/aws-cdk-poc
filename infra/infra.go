@@ -100,7 +100,7 @@ func (r *replicationTester) addPoliciesToReplicationRole() {
 	policy.AddStatements(awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
 		Actions:   &[]*string{jsii.String("s3:ReplicateObject"), jsii.String("s3:ReplicateDelete"), jsii.String("s3:ReplicateTags")},
 		Effect:    awsiam.Effect_ALLOW,
-		Resources: &[]*string{r.destinationBucket.AttrArn()},
+		Resources: &[]*string{jsii.String(*r.destinationBucket.AttrArn() + "/*")},
 	}))
 
 	policy.AddStatements(awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
@@ -111,6 +111,12 @@ func (r *replicationTester) addPoliciesToReplicationRole() {
 
 	policy.AddStatements(awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
 		Actions:   &[]*string{jsii.String("s3:GetObjectVersionForReplication"), jsii.String("s3:GetObjectVersionAcl"), jsii.String("s3:GetObjectVersionTagging")},
+		Effect:    awsiam.Effect_ALLOW,
+		Resources: &[]*string{jsii.String(*r.sourceBucket.AttrArn() + "/*")},
+	}))
+
+	policy.AddStatements(awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
+		Actions:   &[]*string{jsii.String("s3:ObjectOwnerOverrideToBucketOwner")},
 		Effect:    awsiam.Effect_ALLOW,
 		Resources: &[]*string{jsii.String(*r.destinationBucket.AttrArn() + "/*")},
 	}))
@@ -154,6 +160,7 @@ func (r *replicationTester) CreateIamRoleComponents() {
 		Description:    jsii.String("test role for replication oppermax"),
 		InlinePolicies: nil,
 		RoleName:       jsii.String("max-test-replication-role"),
+		Path: jsii.String("/"),
 	})
 
 }
