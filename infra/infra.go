@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-cdk-go/awscdk/awscloudwatch"
 	"github.com/aws/aws-cdk-go/awscdk/awsiam"
 	"github.com/aws/aws-cdk-go/awscdk/awss3"
+	"github.com/aws/aws-cdk-go/awscdk/awslambda"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/aws/constructs-go/constructs/v3"
@@ -194,13 +195,13 @@ func (r *replicationTester) NewReplicationMonitoringTestStack(scope constructs.C
 	stack := awscdk.NewStack(scope, &id, &sprops)
 
 	// The code that defines your replicationStack goes here
-	awscloudwatch.NewCfnAnomalyDetector(stack, jsii.String("foo"), &awscloudwatch.CfnAnomalyDetectorProps{
+	awscloudwatch.NewCfnAnomalyDetector(stack, jsii.String("max-test-anomaly-detector"), &awscloudwatch.CfnAnomalyDetectorProps{
 		MetricName: jsii.String("OperationsPendingReplication"),
 		Namespace:  jsii.String("AWS/S3"),
 		Stat:       jsii.String("Average"),
 	})
 
-	awscloudwatch.NewCfnAlarm(stack, jsii.String("foo"), &awscloudwatch.CfnAlarmProps{
+	awscloudwatch.NewCfnAlarm(stack, jsii.String("max-test-anomaly-detector-alarm"), &awscloudwatch.CfnAlarmProps{
 		ComparisonOperator: jsii.String("GreaterThanUpperThreshold"),
 		EvaluationPeriods:  jsii.Number(2),
 		ActionsEnabled:     jsii.Bool(true),
@@ -238,14 +239,41 @@ func (r *replicationTester) NewReplicationMonitoringTestStack(scope constructs.C
 	return stack
 }
 
+
+func (r *replicationTester) NewReplicationTestLambdaStack(scope constructs.Construct, id string, props *InfraStackProps) awscdk.Stack {
+	var sprops awscdk.StackProps
+	if props != nil {
+		sprops = props.StackProps
+	}
+	stack := awscdk.NewStack(scope, &id, &sprops)
+
+	// The code that defines your replicationStack goes here
+	
+	awslambda.NewFunction(stack, jsii.String("max-test-replication-lambda"),&awslambda.FunctionProps{
+		FunctionName: jsii.String("max-test-handler"),
+		Code:         awslambda.Code_FromAsset(jsii.String("bin/replication-tester"), nil),
+		Runtime:      awslambda.Runtime_GO_1_X(),
+		Handler:      jsii.String("main"),
+		Timeout:      awscdk.Duration_Seconds(jsii.Number(30)),
+	})
+
+	return stack
+}
+
+
 func main() {
 	app := awscdk.NewApp(nil)
 
 	r := replicationTester{}
 
-	r.NewReplicationTestStack(app, "max-test-replication-replicationStack", &InfraStackProps{awscdk.StackProps{
+	r.NewReplicationTestStack(app, "max-test-replication-stack", &InfraStackProps{awscdk.StackProps{
 		Env:       env(),
-		StackName: jsii.String("max-test-replication-replicationStack"),
+		StackName: jsii.String("max-test-replication-stack"),
+	}})
+
+	r.NewReplicationMonitoringTestStack(app, "max-test-replication-monitorStack", &InfraStackProps{awscdk.StackProps{
+		Env:                   env(),
+		StackName:             jsii.String("max-test-replication-monitorStack"),
 	}})
 
 	app.Synth(nil)
