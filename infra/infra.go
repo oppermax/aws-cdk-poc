@@ -11,12 +11,10 @@ import (
 	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/aws/constructs-go/constructs/v3"
 	"github.com/aws/jsii-runtime-go"
+	"github.com/oppermax/cdk-poc/pkg/util"
 )
 
-const (
-	sourceBucketName      = "max-test-replication-source-bucket"
-	destinationBucketName = "max-test-replication-destination-bucket"
-)
+
 
 func getAccountId() *string {
 	sess, err := session.NewSession()
@@ -81,7 +79,7 @@ func (r *replicationTester) CreateSourceComponents() {
 	r.replcationRule = r.createReplicationRule()
 
 	r.sourceBucket = awss3.NewCfnBucket(r.replicationStack, jsii.String("MaxTestReplicationSourceBucket"), &awss3.CfnBucketProps{
-		BucketName:              jsii.String(sourceBucketName),
+		BucketName:              jsii.String(SourceBucketName),
 		VersioningConfiguration: awss3.CfnBucket_VersioningConfigurationProperty{Status: jsii.String("Enabled")},
 		ReplicationConfiguration: awss3.CfnBucket_ReplicationConfigurationProperty{
 			Role:  r.replicatioRole.RoleArn(),
@@ -94,7 +92,7 @@ func (r *replicationTester) CreateSourceComponents() {
 func (r *replicationTester) CreateDestinationComponents() {
 
 	r.destinationBucket = awss3.NewCfnBucket(r.replicationStack, jsii.String("MaxTestReplicationDestinationBucket"), &awss3.CfnBucketProps{
-		BucketName:              jsii.String(destinationBucketName),
+		BucketName:              jsii.String(DestinationBucketName),
 		VersioningConfiguration: awss3.CfnBucket_VersioningConfigurationProperty{Status: jsii.String("Enabled")},
 	})
 
